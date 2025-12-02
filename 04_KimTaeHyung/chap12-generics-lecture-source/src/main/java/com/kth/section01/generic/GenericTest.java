@@ -1,4 +1,4 @@
-package com.ohgiraffers.section01.generic;
+package com.kth.section01.generic;
 
 /* 제네릭
 * - 데이터의 타입을 일반화한다는 의미
@@ -18,4 +18,6 @@ public class GenericTest<T> {
   public T getValue(){
     return value;
   }
+
+
 }
