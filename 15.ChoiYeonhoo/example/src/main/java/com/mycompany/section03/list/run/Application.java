@@ -22,6 +22,10 @@ public class Application {
 
     do {
 
+      /* 추가할만한 기능 :
+       * 입력 기능 개선 : 가격 음수 방지
+       *
+       * */
       System.out.println("\n======== 도서 관리 프로그램 ========\n");
 
       System.out.println("1. 모든 도서 목록 조회");
@@ -155,6 +159,7 @@ public class Application {
     System.out.println(bookNumber + "번 책이 추가 되었습니다.");
   }
 
+  /* 추가할만한 기능 : 도서 수정 기능 BookService로 통합
   /* 4. 도서 수정 */
   private void updateBook() {
     System.out.println("\n***** 도서 수정 *****\n");
@@ -184,6 +189,7 @@ public class Application {
     int updatePrice = sc.nextInt();
     sc.nextLine();
 
+    //
     // book은 bookService의 해당 번호의 책 정보에 해당하는 주소를 저장함 (얕은 복사)
     // 그러므로 해당 내용을 수정하면 원본도 수정이 된다.
     book.setTitle(updateTitle);

@@ -7,26 +7,20 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BookService {
   private List<BookDTO> bookList;
 
+  private String CSVFilePath = "C:\\SWCAMP22\\02_java\\15.ChoiYeonhoo\\example\\src\\main\\resources\\bookList.csv";
 
   public BookService() {
     this.bookList = new ArrayList<>();
 
     /* 도서 정보 추가 */
     /* 외부 파일에 해당 정보 저장 및 불러오기 */
+    readBookListFromCSV(CSVFilePath);
 
-    loadBookDataFromCSV("C:\\SWCAMP22\\02_java\\15.ChoiYeonhoo\\example\\src\\main\\resources\\bookList.csv");
-
-//    bookList.add(new BookDTO(1, "홍길동전", "허균", 50000));
-//    bookList.add(new BookDTO(2, "목민심서", "정약용", 30000));
-//    bookList.add(new BookDTO(3, "동의보감", "허준", 40000));
-//    bookList.add(new BookDTO(4, "삼국사기", "김부식", 46000));
-//    bookList.add(new BookDTO(5, "삼국유사", "일연", 58000));
   }
 
   //getter
@@ -59,6 +53,11 @@ public class BookService {
    * @param newBook
    * @return number 또는 0
    */
+
+  /* 추가할만한 기능 :
+   * 1. 중복 체크시, 제목뿐만 아니라, 제목+저자 기준
+   *
+   * */
   public int addBook(BookDTO newBook) {
     // 중복 체크
     for (BookDTO book : bookList) {
@@ -73,10 +72,9 @@ public class BookService {
     // 책 정보를 목록에 추가
     newBook.setNumber(nextNumber);
     bookList.add(newBook);
-    return nextNumber;
-
     // 바뀐 리스트 정보 CSV 파일에 저장
-
+    writeBookListToCSV(CSVFilePath);
+    return nextNumber;
   }
 
   /**
@@ -91,13 +89,12 @@ public class BookService {
     // -> 똑같은 번호의 책을 목록에서 제거 후 반환
     for (int i = 0; i < bookList.size(); i++) {
       if (bookList.get(i).getNumber() == bookNumber) {
-
-        return bookList.remove(i);
+        BookDTO removedBook = bookList.remove(i);
+        writeBookListToCSV(CSVFilePath);
+        return removedBook;
       }
     }
     return null;
-    
-    // 바뀐 리스트 정보 CSV 파일에 저장
   }
 
   /**
@@ -108,6 +105,10 @@ public class BookService {
    */
   public List<BookDTO> searchBook(String keyword) {
 
+    /* 추가할만한 기능 :
+    1. 검색 옵션 추가 : 현재 : 이름 -> 저자, 이름 + 저자
+    2. 가격 범위 지정 검색
+    */
     List<BookDTO> searchBookList = new ArrayList<>();
 
     for (BookDTO book : bookList) {
@@ -131,6 +132,10 @@ public class BookService {
     // 스트림을 이용한 List 깊은 복사
     List<BookDTO> sortedBookList = bookList.stream().map(BookDTO::new).collect(Collectors.toList());
 
+
+    /* 추가할만한 기능 : 정렬 기능 추가
+     * 1. 정렬 기준 추가하기 : 현재 : 이름, 가격 -> 저자, id 순 추가
+     * 2. 오름 차순, 내림 차순 선택 하기 */
     if (sortingNumber == 1) { // 기본 정렬 : 이름 오름차순
       Collections.sort(sortedBookList);
     } else {
@@ -140,7 +145,8 @@ public class BookService {
     return sortedBookList;
   }
 
-  private void loadBookDataFromCSV(String filePath) {
+
+  private void readBookListFromCSV(String filePath) {
 
     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
@@ -165,13 +171,31 @@ public class BookService {
         bookList.add(new BookDTO(number, title, author, price));
       }
 
-      System.out.println("📚 CSV 파일 로드 완료: " + filePath);
+      System.out.println(" CSV 파일 로드 완료: " + filePath);
 
     } catch (FileNotFoundException e) {
-      System.out.println("⚠ CSV 파일을 찾을 수 없습니다: " + filePath);
+      System.out.println(" CSV 파일을 찾을 수 없습니다: " + filePath);
       e.printStackTrace();
     } catch (IOException | NumberFormatException e) {
-      System.out.println("⚠ CSV 파일 읽기 중 오류 발생!");
+      System.out.println(" CSV 파일 읽기 중 오류 발생!");
+      e.printStackTrace();
+    }
+  }
+
+  private void writeBookListToCSV(String filePath) {
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+
+      writer.write("number,title,author,price\n");
+
+      for (BookDTO book : bookList) {
+        writer.write(book.getNumber() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getPrice() + "\n");
+      }
+
+      System.out.println("CSV에 책 정보가 저장되었습니다.");
+
+    } catch (IOException e) {
+      System.out.println("CSV 파일 작성에 실패하였습니다.");
       e.printStackTrace();
     }
   }
